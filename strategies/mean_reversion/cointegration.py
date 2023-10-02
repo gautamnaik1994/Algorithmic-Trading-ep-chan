@@ -31,23 +31,30 @@ def simple_linear_regression(df, x, y):
 def johansen_cointegration(df, ticker_one, ticker_two):
     jres = coint_johansen(df[[ticker_one, ticker_two]], det_order=0, k_ar_diff=1)
 
-    summary = []
-
-    for i in range(jres.trace_stat.shape[0]):
-        summary.append([
-            f"r<={i}", jres.trace_stat[i], jres.trace_stat_crit_vals[i][0], jres.trace_stat_crit_vals[i][1],
-            jres.trace_stat_crit_vals[i][2]])
-
+    summary = [
+        [
+            f"r<={i}",
+            jres.trace_stat[i],
+            jres.trace_stat_crit_vals[i][0],
+            jres.trace_stat_crit_vals[i][1],
+            jres.trace_stat_crit_vals[i][2],
+        ]
+        for i in range(jres.trace_stat.shape[0])
+    ]
     print("Johansen Cointegration Test")
     print(tabulate(summary, headers=["NULL:", "Trace Statistics", "Crit 90%", "Crit 95%", "Crit 99%"]))
 
     print("\n")
-    summary = []
-
-    for i in range(jres.max_eig_stat.shape[0]):
-        summary.append([
-            f"r<={i}", jres.max_eig_stat[i], jres.max_eig_stat_crit_vals[i][0], jres.max_eig_stat_crit_vals[i][1],
-            jres.max_eig_stat_crit_vals[i][2]])
+    summary = [
+        [
+            f"r<={i}",
+            jres.max_eig_stat[i],
+            jres.max_eig_stat_crit_vals[i][0],
+            jres.max_eig_stat_crit_vals[i][1],
+            jres.max_eig_stat_crit_vals[i][2],
+        ]
+        for i in range(jres.max_eig_stat.shape[0])
+    ]
     print(tabulate(summary, headers=["NULL:", "Eigen Statistics", "Crit 90%", "Crit 95%", "Crit 99%"]))
 
     print("eigen values: " + " ".join(f"{i:0.6f}" for i in jres.eig))
@@ -77,7 +84,7 @@ def const_beta_pair_mean_reversion_strategy(df, ticker_one, ticker_two, evec, wi
     df = df.dropna(how="any")[:-1]
 
     """Positions (Capital Invested)"""
-    positions = ["pos_" + i for i in cols]
+    positions = [f"pos_{i}" for i in cols]
     df[positions] = (df[cols].mul(evec, axis=1)).mul(df["Z"], axis=0)
 
     """P&L and Return"""
@@ -105,8 +112,12 @@ def main():
 
     data_dir = os.path.join(os.getcwd(), "data/equity/")
 
-    df_one = read_df(data_dir + f"{ticker_one}.csv", return_cols=["Close"], prefix=ticker_one)
-    df_two = read_df(data_dir + f"{ticker_two}.csv", return_cols=["Close"], prefix=ticker_two)
+    df_one = read_df(
+        f"{data_dir}{ticker_one}.csv", return_cols=["Close"], prefix=ticker_one
+    )
+    df_two = read_df(
+        f"{data_dir}{ticker_two}.csv", return_cols=["Close"], prefix=ticker_two
+    )
     df = merge_df([df_one, df_two])
     df.columns = [ticker_one, ticker_two]
 

@@ -14,17 +14,13 @@ def opening_gap_strategy(df: pd.DataFrame, z_entry_score=0.1, rolling_window=90,
 
     df["ret"] = (df["Close"] / df["Open"] - 1) * df["position"]
 
-    if show_results:
-        (1 + df["ret"]).cumprod().plot(label=f"Buy on Gap Strategy")
-        plt.legend()
-        plt.show()
-        print_dashed_line()
-        performance_summary(df["ret"], "Momentum Strategy", params={})
-    else:
-        if return_pos:
-            return df["ret"], df["positions"]
-        else:
-            return df["ret"]
+    if not show_results:
+        return (df["ret"], df["positions"]) if return_pos else df["ret"]
+    (1 + df["ret"]).cumprod().plot(label="Buy on Gap Strategy")
+    plt.legend()
+    plt.show()
+    print_dashed_line()
+    performance_summary(df["ret"], "Momentum Strategy", params={})
 
 
 # In[ ]

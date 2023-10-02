@@ -36,7 +36,7 @@ def monte_carlo(df, strategy, num_simulations=100):
 # In[ ]:
 def main():
     data_dir = os.path.join(Path(os.getcwd()), "data/equity")
-    df = read_df(data_dir + "/IND_IDX_NIFTY_50.csv")
+    df = read_df(f"{data_dir}/IND_IDX_NIFTY_50.csv")
     monte_carlo(df, lambda x: bollinger_bands(x, show_results=False))
 
 

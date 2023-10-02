@@ -18,9 +18,9 @@ def plot_ar_one_process():
     plt.rcParams['figure.figsize'] = [20, 20]
     fig, ax = plt.subplots(nrows=5, ncols=5)
     lmdas = np.linspace(-1.1, 1.1, 23)
+    lnt = 200
     for i in range(23):
         lmda = lmdas[i]
-        lnt = 200
         x = np.random.normal(0, 1, size=(lnt,)) + random.uniform(0.01, 1)
         for j in range(1, lnt):
             x[j] += lmda * x[j - 1] + 0.4 * j / lnt
@@ -150,8 +150,8 @@ def main():
         print("-" * 100)
         print(f"Using {ticker}")
         stationary_result = stationarity_analysis(df_t["Close"].values, adf_sig_level)
-        half_life = stationary_result[2]
         if stationary_result[1] < adf_sig_level:
+            half_life = stationary_result[2]
             linear_mean_reversion_strategy(df_t, min(60, half_life))
         else:
             plt.plot(df[ticker], label=ticker)

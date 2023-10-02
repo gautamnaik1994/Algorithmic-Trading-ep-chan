@@ -30,8 +30,7 @@ def fetch_nse_url(url, start_year, end_year):
         resp = sess.get(url=url, params=params, headers=headers).json()
         print(f"year: {i}, resp len:{len(resp)}")
         data.extend(resp)
-    df = pd.DataFrame.from_records(data)
-    return df
+    return pd.DataFrame.from_records(data)
 
 
 def fetch_nse_dividends_date(start_year=2015, end_year=2020):
@@ -64,7 +63,9 @@ def fetch_nifty_constituents_data(index="NIFTY 100", start_date=date(2015, 1, 1)
 
 def merge_multiple_tickers():
     """Merge Individual Files Into Two (Open & Close) Price Files"""
-    idx_comp = list(pd.read_csv(f"./data/equity/NIFTY_100_STOCKS_LIST.csv")["Symbol"])
+    idx_comp = list(
+        pd.read_csv("./data/equity/NIFTY_100_STOCKS_LIST.csv")["Symbol"]
+    )
     for tp in ["Open", "Close"]:
         df = None
         for ticker in idx_comp:
@@ -73,11 +74,7 @@ def merge_multiple_tickers():
 
             data.columns = [ticker]
             data = data.fillna(-1)
-            if df is None:
-                df = data
-            else:
-                df = df.join(data)
-
+            df = data if df is None else df.join(data)
             print(f"fetched {ticker}....")
         df.to_csv(f"./data/equity/NIFTY_100_CONSTITUENTS_DATA_{tp}.csv")
         print("done")
@@ -87,7 +84,7 @@ def merge_csvs():
     """Merge Forex Files"""
     dfs = []
     for file in os.listdir("./data/forex/"):
-        filepath = "./data/forex/" + file
+        filepath = f"./data/forex/{file}"
         if os.path.isdir(filepath):
             continue
         df = read_df(filepath)
@@ -102,8 +99,6 @@ def merge_csvs():
 
 
 # In[ ]
-if __name__ == "__main__":
-    pass
     # merge_multiple_tickers()
     # fix_df()
     # merge_currencies_csv()
