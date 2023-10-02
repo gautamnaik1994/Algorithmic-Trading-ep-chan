@@ -12,10 +12,7 @@ def fill_positions(x):
     else:
         symbols = x["symbol"].split("|")
         for symbol in x.index:
-            if symbol in symbols:
-                x[symbol] = 1
-            else:
-                x[symbol] = 0
+            x[symbol] = 1 if symbol in symbols else 0
     return x
 
 
@@ -48,9 +45,10 @@ def prepare_dataset():
             dct[nxt_date] = []
         dct[nxt_date].extend(symbols)
 
-    lst = []
-    for date, symbols in dct.items():
-        lst.append({"Date": date, "Symbols": "|".join(symbols)})
+    lst = [
+        {"Date": date, "Symbols": "|".join(symbols)}
+        for date, symbols in dct.items()
+    ]
     df_events = pd.DataFrame.from_records(lst)
     df_events.to_csv("./data/equity/NIFTY_100_POST_EVENT_DATE.csv", index=False)
 
@@ -69,9 +67,10 @@ def prepare_dataset():
             dct[nxt_date] = []
         dct[nxt_date].extend(symbols)
 
-    lst = []
-    for date, symbols in dct.items():
-        lst.append({"Date": date, "Symbols": "|".join(symbols)})
+    lst = [
+        {"Date": date, "Symbols": "|".join(symbols)}
+        for date, symbols in dct.items()
+    ]
     df_ex_div = pd.DataFrame.from_records(lst)
     df_ex_div.to_csv("./data/equity/NIFTY_100_EX_DIV_DATE.csv", index=False)
 
@@ -106,7 +105,7 @@ def post_events_momentum_strategy(df_open, df_close, df_earn_ann, lookback=90, t
 
     returns = df_ret.sum(axis=1)
 
-    (1 + returns).cumprod().plot(label=f"Earnings announcement drift")
+    (1 + returns).cumprod().plot(label="Earnings announcement drift")
     plt.legend()
     plt.show()
 

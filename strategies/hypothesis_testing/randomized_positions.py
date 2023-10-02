@@ -34,7 +34,7 @@ def randomize_positions(df, strategy, num_simulations=100):
 # In[ ]:
 def main():
     data_dir = os.path.join(Path(os.getcwd()), "data/equity")
-    df = read_df(data_dir + "/IND_IDX_NIFTY_50.csv")
+    df = read_df(f"{data_dir}/IND_IDX_NIFTY_50.csv")
     randomize_positions(df, lambda x, return_pos: bollinger_bands(x, show_results=False, return_pos=return_pos))
 
 

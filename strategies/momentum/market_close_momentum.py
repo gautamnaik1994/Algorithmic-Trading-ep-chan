@@ -11,7 +11,7 @@ def market_close_momentum(df: pd.DataFrame, threshold=0.005):
     df["shorts"] = (df["315"] < (1 - threshold) * df["Close"].shift(1)).astype(int)
     df["positions"] = df["shorts"] + df["longs"]
     df["return"] = df["positions"] * (df["Close"] / df["315"] - 1)
-    (1 + df["return"]).cumprod().plot(label=f"Market Close Momentum Strategy")
+    (1 + df["return"]).cumprod().plot(label="Market Close Momentum Strategy")
     plt.legend()
     plt.show()
     print_dashed_line()

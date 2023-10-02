@@ -19,7 +19,7 @@ def t_test(df, strategy):
 # In[ ]:
 def main():
     data_dir = os.path.join(Path(os.getcwd()), "data/equity")
-    df = read_df(data_dir + "/IND_IDX_NIFTY_50.csv")
+    df = read_df(f"{data_dir}/IND_IDX_NIFTY_50.csv")
     t_test(df, lambda x: bollinger_bands(df, show_results=False))
 
 

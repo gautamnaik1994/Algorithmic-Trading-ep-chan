@@ -15,7 +15,10 @@ def calculate_beta_ols(df, ticker_x, ticker_y, lookback, series_type="Close"):
     df["x"] = 0.0
     for i in range(lookback, len(df)):
         df_temp = df.iloc[i - lookback:i]
-        df["x"][i] = -get_slr_coeff(df_temp[ticker_x + "_" + series_type], df_temp[ticker_y + "_" + series_type])
+        df["x"][i] = -get_slr_coeff(
+            df_temp[f"{ticker_x}_{series_type}"],
+            df_temp[f"{ticker_y}_{series_type}"],
+        )
 
     df["y"] = 1
     return df
@@ -23,8 +26,8 @@ def calculate_beta_ols(df, ticker_x, ticker_y, lookback, series_type="Close"):
 
 def calculate_beta_kalman(df, ticker_one, ticker_two, series_type="Close"):
     """Use Kalman Filter To Dynamically Calculate Beta"""
-    x = df[ticker_one + "_" + series_type].values
-    y = df[ticker_two + "_" + series_type].values
+    x = df[f"{ticker_one}_{series_type}"].values
+    y = df[f"{ticker_two}_{series_type}"].values
     delta = 1e-5
     trans_cov = delta / (1 - delta) * np.eye(2)
     obs_mat = np.vstack([x, np.ones(x.shape)]).T[:, np.newaxis]
@@ -48,7 +51,7 @@ def calculate_beta_kalman(df, ticker_one, ticker_two, series_type="Close"):
 
 
 def dynamic_beta_mean_reversion_strategy(df, ticker_x, ticker_y, window, series_type="Close"):
-    cols = [ticker_x + "_" + series_type, ticker_y + "_" + series_type]
+    cols = [f"{ticker_x}_{series_type}", f"{ticker_y}_{series_type}"]
 
     """Dot product, Unit portfolio value"""
     df["Close"] = np.sum(df[cols].values * df[["x", "y"]].values, axis=1)
@@ -58,7 +61,7 @@ def dynamic_beta_mean_reversion_strategy(df, ticker_x, ticker_y, window, series_
     df = df.dropna(how="any")[:-1]
 
     """Positions (Capital Invested)"""
-    positions = ["pos_" + i for i in cols]
+    positions = [f"pos_{i}" for i in cols]
     df[positions] = df[cols].values * df[["x", "y"]].values
     df[positions] = df[positions].mul(df["Z"], axis=0)
 
@@ -88,8 +91,16 @@ def main():
     ticker_one = "AUS_IDX_SNP_ASX"
     ticker_two = "CAN_IDX_SNP_TSK"
 
-    df1 = read_df(data_dir + f"/{ticker_one}.csv", return_cols=["Open", "Close"], prefix=ticker_one)
-    df2 = read_df(data_dir + f"/{ticker_two}.csv", return_cols=["Open", "Close"], prefix=ticker_two)
+    df1 = read_df(
+        f"{data_dir}/{ticker_one}.csv",
+        return_cols=["Open", "Close"],
+        prefix=ticker_one,
+    )
+    df2 = read_df(
+        f"{data_dir}/{ticker_two}.csv",
+        return_cols=["Open", "Close"],
+        prefix=ticker_two,
+    )
     df = merge_df([df1, df2])
 
     """Calculate daily beta"""
@@ -97,7 +108,7 @@ def main():
     # df = calculate_beta_ols(df, ticker_one, ticker_two, lookback=20)
 
     """Calculate closing price of unit portfolio"""
-    cols = [ticker_one + "_Close", ticker_two + "_Close"]
+    cols = [f"{ticker_one}_Close", f"{ticker_two}_Close"]
     df["Close"] = np.sum(df[cols].values * df[["x", "y"]].values, axis=1)
 
     plt.plot(df["Close"], label="Stationary Portfolio")

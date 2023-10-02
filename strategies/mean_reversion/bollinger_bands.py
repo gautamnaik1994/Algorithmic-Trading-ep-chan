@@ -60,17 +60,13 @@ def bollinger_bands(df, long_entry=-1, long_exit=-0.5, short_entry=1, short_exit
     """Strategy Return"""
     df["RT"] = (df["L"] - df["S"]) * df["R"]
 
-    if show_results:
-        (1 + df["RT"]).plot(legend="BB Returns")
-        (1 + df["R"]).plot(legend="Stock Returns")
-        print(f"APR: {get_apr(df['RT'])}, Sharpe Ratio: {get_sharpe_ratio(df['RT'])}")
-        plt.legend()
-        plt.show()
-    else:
-        if return_pos:
-            return df["RT"], df["L"] - df["S"]
-        else:
-            return df["RT"]
+    if not show_results:
+        return (df["RT"], df["L"] - df["S"]) if return_pos else df["RT"]
+    (1 + df["RT"]).plot(legend="BB Returns")
+    (1 + df["R"]).plot(legend="Stock Returns")
+    print(f"APR: {get_apr(df['RT'])}, Sharpe Ratio: {get_sharpe_ratio(df['RT'])}")
+    plt.legend()
+    plt.show()
 
 
 def bollinger_bands_long_short_portfolio(df, ticker_x, ticker_y, evec, long_entry, long_exit, short_entry, short_exit,
@@ -88,7 +84,7 @@ def bollinger_bands_long_short_portfolio(df, ticker_x, ticker_y, evec, long_entr
     df = fill_signal_short(df, short_entry, short_exit)
 
     """Positions (Capital Invested)"""
-    positions = ["pos_" + i for i in cols]
+    positions = [f"pos_{i}" for i in cols]
     df[positions] = df[cols].mul(evec, axis=1)
     # df[positions] = df[positions].mul(df["L"] - df["S"], axis=0)
 
@@ -116,8 +112,12 @@ def main():
 
     ticker_x = "AUS_IDX_SNP_ASX"
     ticker_y = "CAN_IDX_SNP_TSK"
-    df1 = read_df(data_dir + f"/{ticker_x}.csv", return_cols=["Close"], prefix=ticker_x)
-    df2 = read_df(data_dir + f"/{ticker_y}.csv", return_cols=["Close"], prefix=ticker_y)
+    df1 = read_df(
+        f"{data_dir}/{ticker_x}.csv", return_cols=["Close"], prefix=ticker_x
+    )
+    df2 = read_df(
+        f"{data_dir}/{ticker_y}.csv", return_cols=["Close"], prefix=ticker_y
+    )
     df = merge_df([df1, df2])
     df.columns = [ticker_x, ticker_y]
 

@@ -9,7 +9,7 @@ def cross_sectional_mean_reversion(df):
     print_dashed_line()
 
     tickers = df.columns
-    weights = ["weight_" + i for i in tickers]
+    weights = [f"weight_{i}" for i in tickers]
 
     """Mean return of all stocks"""
     mean_ret = df.pct_change().mean(axis=1)
